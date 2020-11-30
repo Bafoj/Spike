@@ -35,6 +35,7 @@ export class MessageService {
         })
     }
 
+    //esto se podría quitar para evitar problemas ya que solo complica todo.
     listenChanges(): Observable<unknown>{
         return new Observable(observable =>{
             this.socket.on("messages",(messages:string[])=>{
