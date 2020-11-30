@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { observable, Observable } from 'rxjs';
-import { connect } from 'socket.io-client';
+import { io } from 'socket.io-client/dist/socket.io';
 import { environment } from '../../environments/environment';
-
+import { startWith } from 'rxjs/operators';
 
 
 @Injectable({
@@ -11,18 +11,17 @@ import { environment } from '../../environments/environment';
 export class MessageService {
 
     private localState:string[]=[];
-    private socket:SocketIOClient.Socket;
+    private socket;
     private interval;
     private modified:boolean;
 
     constructor() { 
-        this.socket = connect(environment.urlServer)
+        this.socket = io(environment.urlServer)
         this.socket.on("connect",()=>{
-            this.modified=false;
             this.socket.emit("emmitter");
-            this.updateState(this.localState);
+            this.updateState();
             this.interval = setInterval(()=>{
-                this.updateState(this.localState);
+                this.updateState();
             },5000)
         })
         this.socket.on("disconect",()=>{
@@ -30,21 +29,21 @@ export class MessageService {
             this.interval.unref();
         })
 
-        this.socket.on("initialState", (messages)=>{
+        this.socket.on("messages", (messages)=>{
             this.localState=messages;
-            this.modified=true;
+            this.modified=false;
         })
     }
 
-    listenChanges(): Observable<string[]>{
+    listenChanges(): Observable<unknown>{
         return new Observable(observable =>{
             this.socket.on("messages",(messages:string[])=>{
                 observable.next(messages)
             })
-        })
+        }).pipe(startWith(this.localState));
     }
 
-    updateState(state:string[]){
+    updateState(){
         this.socket.emit("newState", {updated:this.modified, state:this.localState})
         console.log("Estado actualizado")
         this.modified=false;

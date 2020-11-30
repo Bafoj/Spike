@@ -39,7 +39,7 @@ function startServer() {
     var timeout;
       console.log("nueva conexión");
       console.log(messages)
-      socket.emit("initialState", messages)
+      io.emit("messages", messages);
       socket.on("observer",()=>{
         console.log("Añadido observer");
         
