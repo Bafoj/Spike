@@ -28,42 +28,52 @@ let io = require("socket.io")(app, {
 
 var messages:string[]= [];
 
-io.on("connection", (socket) => {
-var timeout;
-  console.log("nueva conexión");
-  
-  socket.on("observer",()=>{
-    console.log("Añadido observer");
+var a = firestore.collection('mensajes').doc('estado').get().then(doc => {
+  messages=doc.data().messages;
+  startServer()
+  })
+
+function startServer() {
+
+  io.on("connection", (socket) => {
+    var timeout;
+      console.log("nueva conexión");
+      console.log(messages)
+      socket.emit("initialState", messages)
+      socket.on("observer",()=>{
+        console.log("Añadido observer");
+        
+        socket.join("observers")
+      })
     
-    socket.join("observers")
-  })
-
-  socket.on("emmitter",()=>{
-    console.log("Añadido emmiter");
-    socket.join("emmitters")
-    socket.join("observers")
-    timeout = setTimeout(()=>{
-    console.log("conexion lost");
+      socket.on("emmitter",()=>{
+        console.log("Añadido emmiter");
+        socket.join("emmitters")
+        socket.join("observers")
+        timeout = setTimeout(()=>{
+        console.log("conexion lost");
+        
+        io.emit("conexionlost")
+        },20000)
+      })
     
-    io.emit("conexionlost")
-    },20000)
-  })
+      socket.on("newState", (state)=>{
+        if( socket.rooms.has("emmitters")){
+          timeout.refresh();
+          if (state.updated) {
+            messages = state.state
+            firestore.collection('mensajes').doc('estado').set({messages:messages});
+            console.log(messages)
+            io.emit("messages", messages);
+          }
+          
+        }
+      })
+    });
 
-  socket.on("newState", (state)=>{
-    if( socket.rooms.has("emmitters")){
-      timeout.refresh();
-      if (state.updated) {
-        messages = state.state
-        firestore.collection('mensajes').doc('estado').set({messages:messages});
-        console.log(messages)
-        io.emit("messages", messages);
-      }
-      
-    }
-  })
+}
 
- 
-});
+
 
 
 

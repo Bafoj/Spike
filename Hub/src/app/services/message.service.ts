@@ -18,7 +18,7 @@ export class MessageService {
     constructor() { 
         this.socket = connect(environment.urlServer)
         this.socket.on("connect",()=>{
-            this.modified=true;
+            this.modified=false;
             this.socket.emit("emmitter");
             this.updateState(this.localState);
             this.interval = setInterval(()=>{
@@ -28,6 +28,11 @@ export class MessageService {
         this.socket.on("disconect",()=>{
             console.log("Server disconected");
             this.interval.unref();
+        })
+
+        this.socket.on("initialState", (messages)=>{
+            this.localState=messages;
+            this.modified=true;
         })
     }
 
@@ -50,6 +55,7 @@ export class MessageService {
         this.modified=true;
     }
     
+
 }
 
 
