@@ -13,9 +13,12 @@ export class MessageService {
     private localState:string[]=[];
     private socket:SocketIOClient.Socket;
     private interval;
+    private modified:boolean;
+
     constructor() { 
         this.socket = connect(environment.urlServer)
         this.socket.on("connect",()=>{
+            this.modified=true;
             this.socket.emit("emmitter");
             this.updateState(this.localState);
             this.interval = setInterval(()=>{
@@ -37,11 +40,14 @@ export class MessageService {
     }
 
     updateState(state:string[]){
-        this.socket.emit("newState",this.localState)
+        this.socket.emit("newState", {updated:this.modified, state:this.localState})
+        console.log("Estado actualizado")
+        this.modified=false;
     }
 
     addMessage(message:string){
         this.localState.push(message)
+        this.modified=true;
     }
     
 }

@@ -1,12 +1,21 @@
 import * as express from 'express'
-
+import firebase from 'firebase'
 
 const PORT = process.env.PORT || 3000;
 const app = express()
 .listen(PORT ,()=>{console.log(`Escuchando en ${PORT}`);}
 );
 
-
+var firebaseapp = firebase.initializeApp({
+  apiKey: "AIzaSyAo_npbOyiYZ5UELsvXnUuagIDvQmAFbes",
+  authDomain: "servidor-8d38d.firebaseapp.com",
+  databaseURL: "https://servidor-8d38d.firebaseio.com",
+  projectId: "servidor-8d38d",
+  storageBucket: "servidor-8d38d.appspot.com",
+  messagingSenderId: "994168874382",
+  appId: "1:994168874382:web:68407e278d6e4b9a65f0df",
+  measurementId: "G-CCQSLTK9TL"});
+  var firestore = firebaseapp.firestore();
 
 let io = require("socket.io")(app, {
   cors: {
@@ -40,12 +49,16 @@ var timeout;
     },20000)
   })
 
-  socket.on("newState", (state:string[])=>{
+  socket.on("newState", (state)=>{
     if( socket.rooms.has("emmitters")){
-      messages = state
       timeout.refresh();
-      console.log(messages)
-      io.emit("messages", messages);
+      if (state.updated) {
+        messages = state.state
+        firestore.collection('mensajes').doc('estado').set({messages:messages});
+        console.log(messages)
+        io.emit("messages", messages);
+      }
+      
     }
   })
 
