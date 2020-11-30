@@ -1,0 +1,12 @@
+<div>
+    <div>
+        <input [(ngModel)] = "newMessage" type="text" placeholder="Mesaje a añadir">
+        <button (click)="addMessage()">Submit</button>
+    </div>
+
+    <ul>
+        <li *ngFor="let message of messages">
+            {{message}}
+        </li>
+    </ul>
+</div>

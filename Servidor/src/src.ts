@@ -32,6 +32,7 @@ var timeout;
   socket.on("emmitter",()=>{
     console.log("Añadido emmiter");
     socket.join("emmitters")
+    socket.join("observers")
     timeout = setTimeout(()=>{
     console.log("conexion lost");
     
@@ -43,7 +44,8 @@ var timeout;
     if( socket.rooms.has("emmitters")){
       messages = state
       timeout.refresh();
-      socket.to("observers").emit("messages", messages);
+      console.log(messages)
+      io.emit("messages", messages);
     }
   })
 
