@@ -10,10 +10,9 @@ import { startWith } from 'rxjs/operators';
 })
 export class MessageService {
 
-    private localState:string[]=[];
     private socket;
     private interval;
-    private modified:boolean;
+    private additions:string[] = [];
 
     constructor() { 
         this.socket = io(environment.urlServer)
@@ -29,30 +28,33 @@ export class MessageService {
             this.interval.unref();
         })
 
-        this.socket.on("messages", (messages)=>{
-            this.localState=messages;
-            this.modified=false;
-        })
+    
     }
 
     //esto se podría quitar para evitar problemas ya que solo complica todo.
     listenChanges(): Observable<unknown>{
         return new Observable(observable =>{
             this.socket.on("messages",(messages:string[])=>{
-                observable.next(messages)
+                if(messages){
+                    observable.next(messages)}
+                    else{
+                        console.log("vacio");
+                        
+                        observable.next([])
+                    }
             })
-        }).pipe(startWith(this.localState));
+        });
     }
 
     updateState(){
-        this.socket.emit("newState", {updated:this.modified, state:this.localState})
-        console.log("Estado actualizado")
-        this.modified=false;
+        this.socket.emit("addMessage",this.additions)
+        console.log("Estado actualizado",this.additions)
+        this.additions = []
+        
     }
 
     addMessage(message:string){
-        this.localState.push(message)
-        this.modified=true;
+        this.additions.push(message)
     }
     
 

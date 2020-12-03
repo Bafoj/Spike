@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  urlServer:'http://localhost:3000'
+  urlServer:'https://prueba-de-socket-io.herokuapp.com/'
 };
 
 /*

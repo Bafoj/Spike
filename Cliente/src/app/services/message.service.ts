@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { observable, Observable } from 'rxjs';
-import { connect } from 'socket.io-client';
+import * as io from 'socket.io-client/dist/socket.io';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -8,16 +8,14 @@ import { environment } from '../../environments/environment';
 })
 export class MessageService {
 
-    private socket:SocketIOClient.Socket;
-    private interval;
+    private socket;
+    
     constructor() { 
-        this.socket = connect(environment.urlServer)
-        this.socket.on("connect",()=>{
-            this.socket.emit("observer");
-        })
+        this.socket = io(environment.urlServer)
+        
         this.socket.on("disconect",()=>{
             console.log("Server disconected");
-            this.interval.unref();
+            
         })
     }
 

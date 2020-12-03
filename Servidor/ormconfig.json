@@ -1,0 +1,8 @@
+{
+  "name": "default",
+  "type": "postgres",
+  "url": "postgres://nltdyigplibeis:a263a2a6908ffdf4edd5d948f20589adba1cbf13357da77b592d58e53321d86a@ec2-34-200-106-49.compute-1.amazonaws.com:5432/d4v8rglo0oac4f",
+  "entities": ["dist/entity/**/*.js"],
+  "logging": true,
+  "synchronize": true
+}
