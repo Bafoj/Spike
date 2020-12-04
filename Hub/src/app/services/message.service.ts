@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { observable, Observable } from 'rxjs';
-import { io } from 'socket.io-client';
-import { environment } from '../../environments/environment';
-import { startWith } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {observable, Observable, Subscriber} from 'rxjs';
+import {io} from 'socket.io-client';
+import {environment} from '../../environments/environment';
+import {startWith} from 'rxjs/operators';
 
 
 @Injectable({
@@ -10,91 +10,52 @@ import { startWith } from 'rxjs/operators';
 })
 export class MessageService {
 
-    private socket;
-    private interval;
-    private additions:string[] = [];
+  private socket;
+  private interval;
+  private additions: string[] = [];
 
-    constructor() { 
-        this.socket = io(environment.urlServer)
-        this.socket.on("connect",()=>{
-            this.socket.emit("emmitter");
-            this.updateState();
-            this.interval = setInterval(()=>{
-                this.updateState();
-            },5000)
-        })
-        this.socket.on("disconect",()=>{
-            console.log("Server disconected");
-            this.interval.unref();
-        })
+  constructor() {
+    this.socket = io(environment.urlServer);
+    this.socket.on('connect', () => {
+      this.socket.emit('emmitter');
+      this.updateState();
+      this.interval = setInterval(() => {
+        this.updateState();
+      }, 5000);
+    });
+    this.socket.on('disconect', () => {
+      console.log('Server disconected');
+      this.interval.unref();
+    });
 
-    
-    }
 
-    //esto se podría quitar para evitar problemas ya que solo complica todo.
-    listenChanges(): Observable<unknown>{
-        return new Observable(observable =>{
-            this.socket.on("messages",(messages:string[])=>{
-                if(messages){
-                    observable.next(messages)}
-                    else{
-                        console.log("vacio");
-                        
-                        observable.next([])
-                    }
-            })
-        });
-    }
+  }
 
-    updateState(){
-        this.socket.emit("addMessage",this.additions)
-        console.log("Estado actualizado",this.additions)
-        this.additions = []
-        
-    }
+  listenChanges(): Observable<string[]> {
+    // tslint:disable-next-line:no-shadowed-variable
+    return new Observable((observable ) => {
+      this.socket.on('messages', (messages: string[]) => {
+        if (messages) {
+          observable.next(messages);
+        } else {
+          console.log('vacio');
 
-    addMessage(message:string){
-        this.additions.push(message)
-    }
-    
+          observable.next([]);
+        }
+      });
+    });
+  }
+
+  updateState(): void{
+    this.socket.emit('addMessage', this.additions);
+    console.log('Estado actualizado', this.additions);
+    this.additions = [];
+
+  }
+
+  addMessage(message: string): void{
+    this.additions.push(message);
+  }
+
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

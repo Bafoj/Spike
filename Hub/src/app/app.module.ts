@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
   declarations: [
     AppComponent,
     MessageListComponent,
-    
   ],
   imports: [
     FormsModule,

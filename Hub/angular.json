@@ -13,9 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": [
-              "lodash"
-            ],
+            "allowedCommonJsDependencies": ["lodash","socket.io-client"],
             "outputPath": "dist/Hub",
             "index": "src/index.html",
             "main": "src/main.ts",
