@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {observable, Observable} from 'rxjs';
-import {io} from 'socket.io-client';
+import {io, Socket} from 'socket.io-client';
+import { startWith } from 'rxjs/operators';
 import {environment} from '../../environments/environment';
 
 @Injectable({
@@ -8,10 +9,15 @@ import {environment} from '../../environments/environment';
 })
 export class MessageService {
 
-  private socket;
+  private socket:Socket;
 
+  messages:string[];
   constructor() {
     this.socket = io(environment.urlServer);
+
+    this.socket.on('messages', (messages: string[]) => {
+      this.messages = messages
+    });
 
     this.socket.on('disconect', () => {
       console.log('Server disconected');
@@ -19,10 +25,11 @@ export class MessageService {
     });
   }
 
-  listenChanges(): Observable<string[]> {
-    return new Observable(observable => {
+  
+  listenChanges(): Observable<string[]>{
+    return new Observable(sus => {
       this.socket.on('messages', (messages: string[]) => {
-        observable.next(messages);
+        sus.next(messages);
       });
     });
   }

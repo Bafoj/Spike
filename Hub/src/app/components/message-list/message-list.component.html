@@ -1,7 +1,7 @@
 <div>
     <div>
-        <input [(ngModel)] = "newMessage" type="text" placeholder="Mesaje a añadir">
-        <button (click)="addMessage()">Submit</button>
+        <input #newMessage type="text" placeholder="Mesaje a añadir">
+        <button (click)="addMessage(newMessage.value);newMessage.value=''">Submit</button>
     </div>
 
     <ul>

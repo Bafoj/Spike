@@ -8,18 +8,16 @@ import { MessageService } from '../../services/message.service';
 })
 export class MessageListComponent implements OnInit {
   constructor(private ms: MessageService) {}
-  messages: string[]=[];
-  newMessage:string;
+  messages: string[] = [];
   ngOnInit(): void {
-    this.ms.listenChanges().subscribe((data:string[]) => {
+    this.ms.listenChanges().subscribe((data: string[]) => {
       console.log(data);
-      
+
       this.messages = data;
     });
   }
 
-  addMessage() {
-    this.ms.addMessage(this.newMessage);
-    this.newMessage="";
+  addMessage(message: string): void {
+    this.ms.addMessage(message);
   }
 }
